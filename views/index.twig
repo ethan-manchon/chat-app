@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Chat App</h1>
+        <form id="chat-form" autocomplete="off">
+            <input id="pseudo" type="text" placeholder="Pseudo" required>
+            <input id="message" autocomplete="off" placeholder="Message" required>
+            <button type="submit">Send</button>
+        </form>
+        <ul id="messages"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const form = document.getElementById('chat-form');
+        const inputPseudo = document.getElementById('pseudo');
+        const inputMessage = document.getElementById('message');
+        const messages = document.getElementById('messages');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (inputPseudo.value && inputMessage.value) {
+                socket.emit('chat message', {
+                    pseudo: inputPseudo.value,
+                    message: inputMessage.value
+                });
+                inputMessage.value = '';
+                inputMessage.focus();
+            }
+        });
+
+        socket.on('chat message', function(data) {
+            const item = document.createElement('li');
+            const pseudoSpan = document.createElement('span');
+            pseudoSpan.className = 'pseudo';
+            pseudoSpan.textContent = data.pseudo;
+            const messageSpan = document.createElement('span');
+            messageSpan.className = 'message';
+            messageSpan.textContent = data.message;
+            item.appendChild(pseudoSpan);
+            item.appendChild(messageSpan);
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+    </script>
+</body>
+</html>
