@@ -1,212 +1,105 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat App Pro</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style.css">
-</head>
-<style>
-body {
-    background: linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%);
-    font-family: 'Inter', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+	<head>
+		<meta charset="UTF-8">
+		<title>Chat App Pro</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="/style.css">
+	</head>
+	<body>
+		<div class="chat-wrapper">
 
-.chat-wrapper {
-    max-width: 420px;
-    margin: 48px auto;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(79,140,255,0.10), 0 2px 8px rgba(0,0,0,0.04);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
+			{% if not pseudo is defined or not pseudo %}
+				<div class="chat-header">
+					<span>💬 Chat App</span>
+				</div>
+				<p>Bienvenue, veuillez entrer votre pseudo pour commencer à discuter.</p>
+				<form id="pseudo-form" autocomplete="off">
+					<input id="pseudo" name="pseudo" type="text" placeholder="Votre pseudo" required>
+					<button type="submit">Commencer</button>
+				</form>
+			{% endif %}
+			{% if pseudo is defined and pseudo %}
+				<div class="chat-header">
+					<span class="chat-title">💬 Chat App</span>
+					<p class="chat-subtitle">Bienvenue
+							<strong>@{{ pseudo|e }}</strong>
+						!</p>
+				</div>
+				<div class="chat-messages">
+					<ul id="messages"></ul>
+				</div>
+				<form class="chat-form" id="chat-form" autocomplete="off">
+					<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
+					<button type="submit">Envoyer</button>
+				</form>
+                {% endif %}
+			</div>
+			 <script src="/socket.io/socket.io.js"></script>
+			 <script>
+					const socket = io();
+					const form = document.getElementById('chat-form');
+					const inputMessage = document.getElementById('message');
+					const messages = document.getElementById('messages');
+					let pseudoValue = '';
+			
+					if (form && inputMessage && messages) {
+						// Affiche les anciens messages à la connexion
+						socket.on('old messages', function(data) {
+							messages.innerHTML = '';
+							data.forEach(function(msg) {
+								const item = document.createElement('li');
+								const pseudoSpan = document.createElement('span');
+								pseudoSpan.className = 'pseudo';
+								pseudoSpan.textContent = (msg.author || 'Anonyme') + ':';
+								const messageSpan = document.createElement('span');
+								messageSpan.className = 'message';
+								messageSpan.textContent = msg.message;
+								item.appendChild(pseudoSpan);
+								item.appendChild(messageSpan);
+								messages.appendChild(item);
+							});
+							messages.scrollTop = messages.scrollHeight;
+						});
 
-.chat-header {
-    background: linear-gradient(90deg, #4f8cff 60%, #357ae8 100%);
-    color: #fff;
-    padding: 22px 28px;
-    font-size: 1.4em;
-    font-weight: 700;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 8px rgba(79,140,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+						form.addEventListener('submit', function(e) {
+							e.preventDefault();
+							// Get pseudo from input or display
+							if (!pseudoValue) {
+								const inputPseudo = document.getElementById('pseudo-input');
+								if (inputPseudo && inputPseudo.value) {
+									pseudoValue = inputPseudo.value;
+								} else {
+									// Try to get pseudo from server-rendered variable
+									pseudoValue = "{{ pseudo|e('js') }}";
+								}
+							}
+							if (pseudoValue && inputMessage.value) {
+								socket.emit('chat message', {
+									pseudo: pseudoValue,
+									message: inputMessage.value
+								});
+								inputMessage.value = '';
+								inputMessage.focus();
+							}
+						});
 
-.chat-header::after {
-    content: "🔔";
-    font-size: 1.2em;
-    animation: bell-shake 1.2s infinite;
-}
-
-@keyframes bell-shake {
-    0%, 100% { transform: rotate(0deg);}
-    20% { transform: rotate(-10deg);}
-    40% { transform: rotate(10deg);}
-    60% { transform: rotate(-10deg);}
-    80% { transform: rotate(10deg);}
-}
-
-.chat-messages {
-    flex: 1;
-    padding: 18px 28px;
-    overflow-y: auto;
-    min-height: 220px;
-    max-height: 320px;
-    background: #f8faff;
-}
-
-#messages {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-#messages li {
-    margin-bottom: 14px;
-    padding: 10px 14px;
-    background: #eaf1ff;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 1px 4px rgba(79,140,255,0.04);
-    transition: background 0.2s;
-}
-
-#messages li.alert {
-    background: #ffe5e5;
-    border-left: 4px solid #ff4f4f;
-    color: #c0392b;
-    font-weight: 600;
-    animation: alert-pop 0.5s;
-}
-
-@keyframes alert-pop {
-    0% { transform: scale(0.9);}
-    60% { transform: scale(1.05);}
-    100% { transform: scale(1);}
-}
-
-.pseudo {
-    font-weight: 700;
-    color: #4f8cff;
-    margin-right: 8px;
-    font-size: 1.05em;
-}
-
-.message {
-    word-break: break-word;
-    font-size: 1em;
-}
-
-.chat-form {
-    display: flex;
-    border-top: 1px solid #e6e9f0;
-    padding: 18px 28px;
-    background: #f6f8fc;
-}
-
-.chat-form input[type="text"],
-.chat-form input[type="message"] {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #dbe2ef;
-    border-radius: 8px;
-    font-size: 1em;
-    margin-right: 12px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background: #f8faff;
-    box-shadow: 0 1px 2px rgba(79,140,255,0.04);
-}
-
-.chat-form input:focus {
-    border-color: #4f8cff;
-    box-shadow: 0 0 0 2px #e0e7ff;
-}
-
-.chat-form button {
-    background: linear-gradient(90deg, #4f8cff 60%, #357ae8 100%);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 22px;
-    font-size: 1em;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(79,140,255,0.08);
-}
-
-.chat-form button:hover {
-    background: linear-gradient(90deg, #357ae8 60%, #4f8cff 100%);
-    box-shadow: 0 4px 16px rgba(79,140,255,0.12);
-}
-</style>
-<body>
-    <div class="chat-wrapper">
-        <div class="chat-header">
-            <span>💬 Chat App</span>
-        </div>
-        <div class="chat-messages">
-            <ul id="messages"></ul>
-        </div>
-        <form class="chat-form" id="chat-form" autocomplete="off">
-            <input id="message" autocomplete="off" placeholder="Votre message" required>
-            <button type="submit">Envoyer</button>
-        </form>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        let pseudo = '';
-        window.onload = function() {
-            while (!pseudo) {
-                pseudo = prompt("Entrez votre pseudo :");
-            }
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.id = 'pseudo';
-            input.value = pseudo;
-            document.getElementById('chat-form').prepend(input);
-
-            const socket = io();
-            const form = document.getElementById('chat-form');
-            const inputPseudo = document.getElementById('pseudo');
-            const inputMessage = document.getElementById('message');
-            const messages = document.getElementById('messages');
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (inputPseudo.value && inputMessage.value) {
-                    socket.emit('chat message', {
-                        pseudo: inputPseudo.value,
-                        message: inputMessage.value
-                    });
-                    inputMessage.value = '';
-                    inputMessage.focus();
-                }
-            });
-
-            socket.on('chat message', function(data) {
-                const item = document.createElement('li');
-                const pseudoSpan = document.createElement('span');
-                pseudoSpan.className = 'pseudo';
-                pseudoSpan.textContent = data.pseudo + ': ';
-                const messageSpan = document.createElement('span');
-                messageSpan.className = 'message';
-                messageSpan.textContent = data.message;
-                item.appendChild(pseudoSpan);
-                item.appendChild(messageSpan);
-                messages.appendChild(item);
-                messages.scrollTop = messages.scrollHeight;
-            });
-        };
-    </script>
-</body>
+						socket.on('chat message', function(data) {
+							const item = document.createElement('li');
+							const pseudoSpan = document.createElement('span');
+							pseudoSpan.className = 'pseudo';
+							pseudoSpan.textContent = data.pseudo + ': ';
+							const messageSpan = document.createElement('span');
+							messageSpan.className = 'message';
+							messageSpan.textContent = data.message;
+							item.appendChild(pseudoSpan);
+							item.appendChild(messageSpan);
+							messages.appendChild(item);
+							messages.scrollTop = messages.scrollHeight;
+						});
+					}
+				</script>
+		</body>
+	</body>
 </html>
