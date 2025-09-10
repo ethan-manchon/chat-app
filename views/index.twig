@@ -2,7 +2,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8">
-		<title>Chat App Pro</title>
+		<title>Chat App</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="/style.css">
@@ -10,10 +10,15 @@
 	<body>
 		<div class="chat-wrapper">
 
+			<div class="chat-header">
+				<span class="chat-title">💬 Chat App</span>
+				{% if pseudo is defined and pseudo %}
+					<p class="chat-subtitle">Bienvenue
+						<strong>@{{ pseudo|e }}</strong>
+						!</p>
+				{% endif %}
+			</div>
 			{% if not pseudo is defined or not pseudo %}
-				<div class="chat-header">
-					<span>💬 Chat App</span>
-				</div>
 				<p>Bienvenue, veuillez entrer votre pseudo pour commencer à discuter.</p>
 				<form id="pseudo-form" autocomplete="off">
 					<input id="pseudo" name="pseudo" type="text" placeholder="Votre pseudo" required>
@@ -21,85 +26,76 @@
 				</form>
 			{% endif %}
 			{% if pseudo is defined and pseudo %}
-				<div class="chat-header">
-					<span class="chat-title">💬 Chat App</span>
-					<p class="chat-subtitle">Bienvenue
-							<strong>@{{ pseudo|e }}</strong>
-						!</p>
-				</div>
-				<div class="chat-messages">
-					<ul id="messages"></ul>
-				</div>
 				<form class="chat-form" id="chat-form" autocomplete="off">
 					<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
 					<button type="submit">Envoyer</button>
 				</form>
-                {% endif %}
+			{% endif %}
+			<div class="chat-messages">
+				<ul id="messages"></ul>
 			</div>
-			 <script src="/socket.io/socket.io.js"></script>
-			 <script>
-					const socket = io();
-					const form = document.getElementById('chat-form');
-					const inputMessage = document.getElementById('message');
-					const messages = document.getElementById('messages');
-					let pseudoValue = '';
+		</div>
+		 <script src="/socket.io/socket.io.js"></script>
+		 <script>
+			const socket = io();
+			const form = document.getElementById('chat-form');
+			const inputMessage = document.getElementById('message');
+			const messages = document.getElementById('messages');
+			let pseudoValue = '';
 			
-					if (form && inputMessage && messages) {
-						// Affiche les anciens messages à la connexion
-						socket.on('old messages', function(data) {
-							messages.innerHTML = '';
-							data.forEach(function(msg) {
-								const item = document.createElement('li');
-								const pseudoSpan = document.createElement('span');
-								pseudoSpan.className = 'pseudo';
-								pseudoSpan.textContent = (msg.author || 'Anonyme') + ':';
-								const messageSpan = document.createElement('span');
-								messageSpan.className = 'message';
-								messageSpan.textContent = msg.message;
-								item.appendChild(pseudoSpan);
-								item.appendChild(messageSpan);
-								messages.appendChild(item);
-							});
-							messages.scrollTop = messages.scrollHeight;
-						});
-
+			if (form && inputMessage && messages) {
+				// Affiche les anciens messages à la connexion
+				socket.on('old messages', function(data) {
+					messages.innerHTML = '';
+					data.forEach(function(msg) {
+						const item = document.createElement('li');
+						const pseudoSpan = document.createElement('span');
+						pseudoSpan.className = 'pseudo';
+						pseudoSpan.textContent = (msg.author || 'Anonyme') + ':';
+						const messageSpan = document.createElement('span');
+						messageSpan.className = 'message';
+						messageSpan.textContent = msg.message;
+						item.appendChild(pseudoSpan);
+						item.appendChild(messageSpan);
+						messages.appendChild(item);
+					});
+					messages.scrollTop = messages.scrollHeight;
+				});
 						form.addEventListener('submit', function(e) {
-							e.preventDefault();
-							// Get pseudo from input or display
-							if (!pseudoValue) {
-								const inputPseudo = document.getElementById('pseudo-input');
-								if (inputPseudo && inputPseudo.value) {
-									pseudoValue = inputPseudo.value;
-								} else {
-									// Try to get pseudo from server-rendered variable
-									pseudoValue = "{{ pseudo|e('js') }}";
-								}
-							}
-							if (pseudoValue && inputMessage.value) {
-								socket.emit('chat message', {
-									pseudo: pseudoValue,
-									message: inputMessage.value
-								});
-								inputMessage.value = '';
-								inputMessage.focus();
-							}
-						});
-
-						socket.on('chat message', function(data) {
-							const item = document.createElement('li');
-							const pseudoSpan = document.createElement('span');
-							pseudoSpan.className = 'pseudo';
-							pseudoSpan.textContent = data.pseudo + ': ';
-							const messageSpan = document.createElement('span');
-							messageSpan.className = 'message';
-							messageSpan.textContent = data.message;
-							item.appendChild(pseudoSpan);
-							item.appendChild(messageSpan);
-							messages.appendChild(item);
-							messages.scrollTop = messages.scrollHeight;
-						});
+					e.preventDefault();
+					// Get pseudo from input or display
+					if (!pseudoValue) {
+						const inputPseudo = document.getElementById('pseudo-input');
+						if (inputPseudo && inputPseudo.value) {
+							pseudoValue = inputPseudo.value;
+						} else {
+							// Try to get pseudo from server-rendered variable
+							pseudoValue = "{{ pseudo|e('js') }}";
+						}
 					}
-				</script>
-		</body>
+					if (pseudoValue && inputMessage.value) {
+						socket.emit('chat message', {
+							pseudo: pseudoValue,
+							message: inputMessage.value
+						});
+						inputMessage.value = '';
+						inputMessage.focus();
+					}
+				});
+						socket.on('chat message', function(data) {
+					const item = document.createElement('li');
+					const pseudoSpan = document.createElement('span');
+					pseudoSpan.className = 'pseudo';
+					pseudoSpan.textContent = data.pseudo + ': ';
+					const messageSpan = document.createElement('span');
+					messageSpan.className = 'message';
+					messageSpan.textContent = data.message;
+					item.appendChild(pseudoSpan);
+					item.appendChild(messageSpan);
+					messages.appendChild(item);
+					messages.scrollTop = messages.scrollHeight;
+				});
+			}
+			</script>
 	</body>
-</html>
+</html></body>
