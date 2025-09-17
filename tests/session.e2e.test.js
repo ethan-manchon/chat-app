@@ -37,7 +37,7 @@ describe('Session utilisateur', () => {
     console.log('Attente pseudo-input');
   await page.waitForSelector('#pseudo-input');
   console.log('Pseudo-input trouvé');
-  await page.fill('#pseudo-input', 'Benoit');
+  await page.fill('#pseudo-input', 'Ethan');
   console.log('Pseudo rempli');
   await page.click('#pseudo-form button[type="submit"]');
 

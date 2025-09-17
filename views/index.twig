@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Chat V3</title>
-  {# <script src="/socket.io/socket.io.js"></script> #}
-  <link rel="stylesheet" href="/styles.css" />
-
-</head>
-<body>
-
-<div class="chat-wrapper">
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Chat V3</title>
+		 <script src="/socket.io/socket.io.js"></script>
+		 <script src="/client.js" defer></script>
+		<link rel="stylesheet" href="/styles.css"/>
+	</head>
+	<body>
+		<div class="chat-wrapper">
 			<div class="chat-header">
 				<span class="chat-title">💬 Chat App</span>
 				{% if pseudo is defined and pseudo %}
@@ -22,87 +21,19 @@
 				<form id="pseudo-form">
 					<div id="pseudo-container">
 						<p>Bienvenue, veuillez entrer votre pseudo pour commencer à discuter.</p>
-						<input type="text" id="pseudo-input" placeholder="Votre pseudo" required />
+						<input type="text" id="pseudo-input" placeholder="Votre pseudo" required/>
 						<button type="submit">Commencer</button>
 					</div>
 				</form>
 			{% endif %}
-		<div id="chat-container" style="display:none;">
-			<h2>Discussion</h2>
-			<ul id="messages"></ul>
-			<form class="chat-form" id="form" autocomplete="off">
-				<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
-				<button type="submit">Envoyer</button>
-			</form>
+			<div id="chat-container" style="display:none;">
+				<h2>Discussion</h2>
+				<ul id="messages"></ul>
+				<form class="chat-form" id="form" autocomplete="off">
+					<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
+					<button type="submit">Envoyer</button>
+				</form>
+			</div>
 		</div>
-		</div>
-    		 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-		 <script>
-					const socket = io();
-					let pseudoValue = '';
-					const pseudoForm = document.getElementById('pseudo-form');
-					const pseudoInput = document.getElementById('pseudo-input');
-					const chatContainer = document.getElementById('chat-container');
-					const form = document.getElementById('form');
-					const inputMessage = document.getElementById('message');
-					const messages = document.getElementById('messages');
-
-					if (pseudoForm && pseudoInput) {
-						pseudoForm.addEventListener('submit', function(e) {
-							e.preventDefault();
-							if (pseudoInput.value) {
-								pseudoValue = pseudoInput.value;
-								pseudoForm.style.display = 'none';
-								if (chatContainer) chatContainer.style.display = 'block';
-							}
-						});
-					}
-
-					if (form && inputMessage && messages) {
-						socket.on('chat history', function(data) {
-							messages.innerHTML = '';
-							data.forEach(function(msg) {
-								const item = document.createElement('li');
-								const pseudoSpan = document.createElement('span');
-								pseudoSpan.className = 'pseudo';
-								pseudoSpan.textContent = (msg.author) + ': ';
-								const messageSpan = document.createElement('span');
-								messageSpan.className = 'message';
-								messageSpan.textContent = msg.message;
-								item.appendChild(pseudoSpan);
-								item.appendChild(messageSpan);
-								messages.appendChild(item);
-							});
-							messages.scrollTop = messages.scrollHeight;
-						});
-
-						form.addEventListener('submit', function(e) {
-							e.preventDefault();
-							if (pseudoValue && inputMessage.value) {
-								socket.emit('chat message', {
-									author: pseudoValue,
-									message: inputMessage.value
-								});
-								inputMessage.value = '';
-								inputMessage.focus();
-							}
-						});
-
-						socket.on('chat message', function(data) {
-							const item = document.createElement('li');
-							const pseudoSpan = document.createElement('span');
-							pseudoSpan.className = 'pseudo';
-							pseudoSpan.textContent = data.author + ': ';
-							const messageSpan = document.createElement('span');
-							messageSpan.className = 'message';
-							messageSpan.textContent = data.message;
-							item.appendChild(pseudoSpan);
-							item.appendChild(messageSpan);
-							messages.appendChild(item);
-							messages.scrollTop = messages.scrollHeight;
-						});
-					}
-					</script>
-</body>
+	</body>
 </html>
- 
