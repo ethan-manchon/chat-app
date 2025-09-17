@@ -18,10 +18,11 @@
 				{% endif %}
 			</div>
 			{% if not pseudo is defined or not pseudo %}
-				<form id="pseudo-form">
+				<form id="login-form">
 					<div id="pseudo-container">
 						<p>Bienvenue, veuillez entrer votre pseudo pour commencer à discuter.</p>
-						<input type="text" id="pseudo-input" placeholder="Votre pseudo" required/>
+						<input type="text" id="pseudo-input" name="pseudo" placeholder="Votre pseudo" autofocus required/>
+						<input type="password" id="password-input" name="password" placeholder="Votre mot de passe" required/>
 						<button type="submit">Commencer</button>
 					</div>
 				</form>
@@ -32,6 +33,7 @@
 				<form class="chat-form" id="form" autocomplete="off">
 					<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
 					<button type="submit">Envoyer</button>
+          <button id="logout" type="button">Déconnexion</button>
 				</form>
 			</div>
 		</div>

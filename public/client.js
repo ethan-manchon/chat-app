@@ -1,19 +1,67 @@
 const socket = io();
 let pseudoValue = "";
-const pseudoForm = document.getElementById("pseudo-form");
+const loginForm = document.getElementById("login-form");
 const pseudoInput = document.getElementById("pseudo-input");
+const passwordInput = document.getElementById("password-input");
 const chatContainer = document.getElementById("chat-container");
 const form = document.getElementById("form");
 const inputMessage = document.getElementById("message");
 const messages = document.getElementById("messages");
+const logoutButton = document.getElementById("logout");
 
-if (pseudoForm && pseudoInput) {
-  pseudoForm.addEventListener("submit", function (e) {
+if (loginForm && pseudoInput) {
+  loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
-    if (pseudoInput.value) {
-      pseudoValue = pseudoInput.value;
-      pseudoForm.style.display = "none";
+    if (pseudoInput.value && passwordInput.value) {
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pseudo: pseudoInput.value,
+            password: passwordInput.value,
+          }),
+        });
+        const result = await response.json();
+        console.log("Réponse du serveur:", result);
+        console.log("Response OK:", response.ok);
+        console.log("Result:", result.success);
+        if (response.ok && result && result.success) {
+          pseudoValue = pseudoInput.value;
+          loginForm.style.display = "none";
+          if (chatContainer) chatContainer.style.display = "block";
+        } else {
+          alert("Identifiants invalides : pseudo: " + pseudoInput.value + " password: " + passwordInput.value);
+        }
+      } catch (err) {
+        alert("Erreur serveur ou réseau");
+      }
+    }
+  });
+}
+// Vérifie la session au chargement de la page
+window.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const response = await fetch("/me", { method: "GET" });
+    const result = await response.json();
+    if (response.ok && result && result.pseudo) {
+      pseudoValue = result.pseudo;
+      if (loginForm) loginForm.style.display = "none";
       if (chatContainer) chatContainer.style.display = "block";
+    }
+  } catch (err) {
+    // ignore, pas de session
+  }
+});
+if (logoutButton) {
+  logoutButton.addEventListener("click", async function () {
+    try {
+      await fetch("/logout", { method: "GET" });
+      window.location.reload();
+    } catch (err) {
+      alert("Erreur lors de la déconnexion");
     }
   });
 }

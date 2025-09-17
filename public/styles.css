@@ -67,6 +67,31 @@ body {
     padding: 0;
 }
 
+#messages {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-color: #a83a3a #fff6f6;
+    scrollbar-width: thin;
+    
+    }
+
+    #messages::-webkit-scrollbar {
+        width: 8px;
+        background: #fff6f6;
+    }
+
+    #messages::-webkit-scrollbar-thumb {
+        background: #a83a3a;
+        border-radius: 8px;
+    }
+
+    #messages::-webkit-scrollbar-track {
+        background: #fff6f6;
+    }
+
 #messages li {
     margin-bottom: 14px;
     padding: 10px 14px;
