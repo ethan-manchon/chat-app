@@ -2,7 +2,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Chat V3</title>
+		<title>Chat V4</title>
 		 <script src="/socket.io/socket.io.js"></script>
 		 <script src="/client.js" defer></script>
 		<link rel="stylesheet" href="/styles.css"/>
@@ -18,14 +18,18 @@
 				{% endif %}
 			</div>
 			{% if not pseudo is defined or not pseudo %}
-				<form id="login-form">
-					<div id="pseudo-container">
+				<div id="pseudo-container">
+					<form id="login-form">
 						<p>Bienvenue, veuillez entrer votre pseudo pour commencer à discuter.</p>
 						<input type="text" id="pseudo-input" name="pseudo" placeholder="Votre pseudo" autofocus required/>
 						<input type="password" id="password-input" name="password" placeholder="Votre mot de passe" required/>
 						<button type="submit">Commencer</button>
-					</div>
-				</form>
+						<button id="go-to-register" type="button">
+							<a href="/register">S'inscrire</a>
+						</button>
+					</form>
+				</div>
+
 			{% endif %}
 			<div id="chat-container" style="display:none;">
 				<h2>Discussion</h2>
@@ -33,7 +37,7 @@
 				<form class="chat-form" id="form" autocomplete="off">
 					<input id="message" autocomplete="off" placeholder="Votre message" required autofocus>
 					<button type="submit">Envoyer</button>
-          <button id="logout" type="button">Déconnexion</button>
+					<button id="logout" type="button">Déconnexion</button>
 				</form>
 			</div>
 		</div>

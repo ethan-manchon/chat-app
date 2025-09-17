@@ -67,6 +67,17 @@ body {
     padding: 0;
 }
 
+button {
+    font-family: 'Inter', Arial, sans-serif;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+button:focus {
+    box-shadow: 0 0 0 3px #882626;
+}
+
 #messages {
     display: flex;
     flex-direction: column;

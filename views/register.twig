@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inscription - Chat App</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="chat-wrapper">
+    <div class="chat-header">
+      <span class="chat-title">💬 Chat App</span>
+      <span class="chat-subtitle">Inscription</span>
+    </div>
+    <div class="chat-messages" style="min-height:0;max-height:none;padding:32px 28px;">
+      <h2 style="margin-top:0;">Créer un compte</h2>
+      {% if success %}
+        <div class="register-success" style="background:#f5eaea;color:#882626;padding:16px;border-radius:8px;margin-bottom:18px;text-align:center;font-weight:600;">{{ message }}</div>
+      {% endif %}
+      {% if not success %}
+      <form id="register-form" method="POST" action="/register" style="display:flex;flex-direction:column;gap:14px;max-width:340px;margin:auto;">
+        <label for="pseudo">Pseudo :</label>
+        <input type="text" id="pseudo" name="pseudo" required autofocus />
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" required />
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="password" required />
+        <button type="submit">S'inscrire</button>
+      </form>
+      {% endif %}
+      <p style="margin-top:24px;text-align:center;">Déjà inscrit ? <a href="/">Connectez-vous</a></p>
+    </div>
+  </div>
+</body>
+</html>

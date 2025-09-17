@@ -26,4 +26,6 @@ model User {
   password  String?
   email     String?  @unique
   isActive  String?
+  validationToken String?
+  isVerified      Boolean @default(false)
 }

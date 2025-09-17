@@ -8,6 +8,8 @@ const form = document.getElementById("form");
 const inputMessage = document.getElementById("message");
 const messages = document.getElementById("messages");
 const logoutButton = document.getElementById("logout");
+const registerForm = document.getElementById("register-form");
+
 
 if (loginForm && pseudoInput) {
   loginForm.addEventListener("submit", async function (e) {
@@ -64,6 +66,10 @@ if (logoutButton) {
       alert("Erreur lors de la déconnexion");
     }
   });
+}
+
+if (registerForm) {
+  
 }
 
 if (form && inputMessage && messages) {
